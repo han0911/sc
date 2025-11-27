@@ -1,39 +1,34 @@
-import React, { useState } from 'react';
-import { Activity, User, Heart, AlertCircle, Loader2 } from 'lucide-react';
+import { useState } from "react";
+import "./App.css";
 
-export default function App() {
+function App() {
   const [formData, setFormData] = useState({
-    apiKey: '',
-    height: '',
-    weight: '',
-    bodyFat: '',
-    muscleMass: '',
-    painAreas: '',
-    diseases: '',
-    personality: ''
+    height: "",
+    weight: "",
+    bodyFat: "",
+    muscleMass: "",
+    painAreas: "",
+    diseases: "",
+    personality: "",
   });
-  
-  const [recommendation, setRecommendation] = useState('');
+
+  const [recommendation, setRecommendation] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const generateRecommendation = async () => {
-    if (!formData.apiKey) {
-      setError('Gemini API 키를 입력해주세요.');
-      return;
-    }
-
+    // API 키 체크 제거 (환경 변수에서 가져오므로)
     setLoading(true);
-    setError('');
-    setRecommendation('');
+    setError("");
+    setRecommendation("");
 
     try {
       const prompt = `
@@ -44,9 +39,9 @@ export default function App() {
 - 몸무게: ${formData.weight}kg
 - 체지방량: ${formData.bodyFat}%
 - 골격근량: ${formData.muscleMass}kg
-- 아픈 곳: ${formData.painAreas || '없음'}
-- 질병: ${formData.diseases || '없음'}
-- 성격: ${formData.personality || '일반적'}
+- 아픈 곳: ${formData.painAreas || "없음"}
+- 질병: ${formData.diseases || "없음"}
+- 성격: ${formData.personality || "일반적"}
 
 **다음 형식으로 추천해주세요:**
 
@@ -68,220 +63,216 @@ export default function App() {
    - 영양 관리
    - 수면 및 휴식
 
-한국어로 친절하고 이해하기 쉽게 작성해주세요.
+한국어로 친절하고 이해하기 쉽게 300자 이내로 작성해주세요.
+
 `;
 
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${formData.apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_KEY}`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: prompt
-              }]
-            }]
-          })
+            contents: [
+              {
+                parts: [
+                  {
+                    text: prompt,
+                  },
+                ],
+              },
+            ],
+          }),
         }
       );
 
       if (!response.ok) {
-        throw new Error('API 요청 실패. API 키를 확인해주세요.');
+        throw new Error("API 요청 실패. API 키를 확인해주세요.");
       }
 
       const data = await response.json();
-      
+
       if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
         setRecommendation(data.candidates[0].content.parts[0].text);
       } else {
-        throw new Error('응답 데이터를 처리할 수 없습니다.');
+        throw new Error("응답 데이터를 처리할 수 없습니다.");
       }
     } catch (err) {
-      setError(err.message || '운동 추천을 생성하는 중 오류가 발생했습니다.');
+      setError(err.message || "운동 추천을 생성하는 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
-          <div className="flex items-center gap-3 mb-6">
-            <Activity className="w-10 h-10 text-indigo-600" />
-            <h1 className="text-3xl font-bold text-gray-800">노인 맞춤형 운동 추천</h1>
+    <div className="app">
+      <div className="container">
+        <div className="card main-card">
+          <div className="header">
+            <svg
+              className="icon-large"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+            <h1>노인 맞춤형 운동 추천</h1>
           </div>
 
-          {/* API Key Input */}
-          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Gemini API 키 *
-            </label>
-            <input
-              type="password"
-              name="apiKey"
-              value={formData.apiKey}
-              onChange={handleChange}
-              placeholder="Gemini API 키를 입력하세요"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            />
-            <p className="text-xs text-gray-600 mt-2">
-              API 키는 저장되지 않으며, 이번 세션에만 사용됩니다.
-            </p>
-          </div>
-
-          {/* User Info Form */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <User className="inline w-4 h-4 mr-1" />
-                키 (cm)
-              </label>
+          <div className="form-grid">
+            <div className="form-group">
+              <label className="label">키 (cm)</label>
               <input
                 type="number"
                 name="height"
                 value={formData.height}
                 onChange={handleChange}
                 placeholder="예: 165"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="input"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <User className="inline w-4 h-4 mr-1" />
-                몸무게 (kg)
-              </label>
+            <div className="form-group">
+              <label className="label">몸무게 (kg)</label>
               <input
                 type="number"
                 name="weight"
                 value={formData.weight}
                 onChange={handleChange}
                 placeholder="예: 60"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="input"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                체지방량 (%)
-              </label>
+            <div className="form-group">
+              <label className="label">체지방량 (%)</label>
               <input
                 type="number"
                 name="bodyFat"
                 value={formData.bodyFat}
                 onChange={handleChange}
                 placeholder="예: 25"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="input"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                골격근량 (kg)
-              </label>
+            <div className="form-group">
+              <label className="label">골격근량 (kg)</label>
               <input
                 type="number"
                 name="muscleMass"
                 value={formData.muscleMass}
                 onChange={handleChange}
                 placeholder="예: 20"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="input"
               />
             </div>
           </div>
 
-          <div className="space-y-4 mb-6">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <AlertCircle className="inline w-4 h-4 mr-1" />
-                아픈 곳
-              </label>
-              <input
-                type="text"
-                name="painAreas"
-                value={formData.painAreas}
-                onChange={handleChange}
-                placeholder="예: 무릎 관절, 허리 통증"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              />
-            </div>
+          <div className="form-group">
+            <label className="label">아픈 곳</label>
+            <input
+              type="text"
+              name="painAreas"
+              value={formData.painAreas}
+              onChange={handleChange}
+              placeholder="예: 무릎 관절, 허리 통증"
+              className="input"
+            />
+          </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <Heart className="inline w-4 h-4 mr-1" />
-                질병
-              </label>
-              <input
-                type="text"
-                name="diseases"
-                value={formData.diseases}
-                onChange={handleChange}
-                placeholder="예: 고혈압, 당뇨"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              />
-            </div>
+          <div className="form-group">
+            <label className="label">질병</label>
+            <input
+              type="text"
+              name="diseases"
+              value={formData.diseases}
+              onChange={handleChange}
+              placeholder="예: 고혈압, 당뇨"
+              className="input"
+            />
+          </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                성격/활동 성향
-              </label>
-              <input
-                type="text"
-                name="personality"
-                value={formData.personality}
-                onChange={handleChange}
-                placeholder="예: 활동적, 조용한 편"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              />
-            </div>
+          <div className="form-group">
+            <label className="label">성격/활동 성향</label>
+            <input
+              type="text"
+              name="personality"
+              value={formData.personality}
+              onChange={handleChange}
+              placeholder="예: 활동적, 조용한 편"
+              className="input"
+            />
           </div>
 
           <button
             onClick={generateRecommendation}
             disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+            className="btn-primary"
           >
             {loading ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <span className="spinner"></span>
                 추천 생성 중...
               </>
             ) : (
               <>
-                <Activity className="w-5 h-5" />
+                <svg
+                  className="btn-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
                 맞춤 운동 추천 받기
               </>
             )}
           </button>
 
           {error && (
-            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-700 flex items-center gap-2">
-                <AlertCircle className="w-5 h-5" />
-                {error}
-              </p>
+            <div className="error-message">
+              <svg
+                className="icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              {error}
             </div>
           )}
         </div>
 
         {recommendation && (
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Heart className="w-6 h-6 text-red-500" />
+          <div className="card result-card">
+            <h2 className="result-title">
+              <svg
+                className="icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
               맞춤형 운동 추천 결과
             </h2>
-            <div className="prose max-w-none">
-              <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
-                {recommendation}
-              </div>
-            </div>
+            <div className="recommendation">{recommendation}</div>
           </div>
         )}
       </div>
     </div>
   );
 }
+
+export default App;
