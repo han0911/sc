@@ -73,7 +73,7 @@ function App() {
 
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${
-          import.meta.env.VITE_GEMINI_API_KEY
+          import.meta.env.VITE_KEY
         }`,
         {
           method: "POST",
