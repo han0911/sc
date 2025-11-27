@@ -3,6 +3,7 @@ import "./App.css";
 
 function App() {
   const [formData, setFormData] = useState({
+    age: "",
     height: "",
     weight: "",
     bodyFat: "",
@@ -10,6 +11,8 @@ function App() {
     painAreas: "",
     diseases: "",
     personality: "",
+    currentExercise: "",
+    preferredTime: "",
   });
 
   const [recommendation, setRecommendation] = useState("");
@@ -25,7 +28,6 @@ function App() {
   };
 
   const generateRecommendation = async () => {
-    // API 키 체크 제거 (환경 변수에서 가져오므로)
     setLoading(true);
     setError("");
     setRecommendation("");
@@ -35,6 +37,7 @@ function App() {
 당신은 노인 건강 전문가입니다. 다음 정보를 바탕으로 안전하고 효과적인 맞춤형 운동 프로그램을 추천해주세요.
 
 **노인 정보:**
+- 나이: ${formData.age}세
 - 키: ${formData.height}cm
 - 몸무게: ${formData.weight}kg
 - 체지방량: ${formData.bodyFat}%
@@ -42,6 +45,8 @@ function App() {
 - 아픈 곳: ${formData.painAreas || "없음"}
 - 질병: ${formData.diseases || "없음"}
 - 성격: ${formData.personality || "일반적"}
+- 현재 운동량: ${formData.currentExercise || "정보 없음"}
+- 선호 운동 시간: ${formData.preferredTime || "정보 없음"}
 
 **다음 형식으로 추천해주세요:**
 
@@ -63,12 +68,11 @@ function App() {
    - 영양 관리
    - 수면 및 휴식
 
-한국어로 친절하고 이해하기 쉽게 300자 이내로 작성해주세요.
-
+한국어로 친절하고 이해하기 쉽게 작성해주세요.
 `;
 
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${import.meta.env.VITE_KEY}`,
         {
           method: "POST",
           headers: {
@@ -124,6 +128,18 @@ function App() {
           </div>
 
           <div className="form-grid">
+            <div className="form-group">
+              <label className="label">나이</label>
+              <input
+                type="number"
+                name="age"
+                value={formData.age}
+                onChange={handleChange}
+                placeholder="예: 70"
+                className="input"
+              />
+            </div>
+
             <div className="form-group">
               <label className="label">키 (cm)</label>
               <input
@@ -205,6 +221,30 @@ function App() {
               value={formData.personality}
               onChange={handleChange}
               placeholder="예: 활동적, 조용한 편"
+              className="input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="label">현재 운동량</label>
+            <input
+              type="text"
+              name="currentExercise"
+              value={formData.currentExercise}
+              onChange={handleChange}
+              placeholder="예: 주 3회 30분 걷기, 운동 안함"
+              className="input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="label">선호 운동 시간</label>
+            <input
+              type="text"
+              name="preferredTime"
+              value={formData.preferredTime}
+              onChange={handleChange}
+              placeholder="예: 오전, 오후, 저녁"
               className="input"
             />
           </div>
