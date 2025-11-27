@@ -10,6 +10,7 @@
   background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
   min-height: 100vh;
   padding: 24px;
+  width: 100vw;
   color: #1f2937;
 }
 
@@ -17,6 +18,7 @@
   max-width: 1024px;
   margin: 0 auto;
 }
+
 
 .card {
   background: white;
