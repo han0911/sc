@@ -72,7 +72,9 @@ function App() {
 `;
 
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${import.meta.env.VITE_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${
+          import.meta.env.VITE_GEMINI_API_KEY
+        }`,
         {
           method: "POST",
           headers: {
@@ -191,14 +193,22 @@ function App() {
 
           <div className="form-group">
             <label className="label">아픈 곳</label>
-            <input
-              type="text"
+            <select
               name="painAreas"
               value={formData.painAreas}
               onChange={handleChange}
-              placeholder="예: 무릎 관절, 허리 통증"
               className="input"
-            />
+            >
+              <option value="">선택해주세요</option>
+              <option value="없음">없음</option>
+              <option value="무릎 관절">무릎 관절</option>
+              <option value="허리">허리</option>
+              <option value="어깨">어깨</option>
+              <option value="손목/팔꿈치">손목/팔꿈치</option>
+              <option value="발목">발목</option>
+              <option value="목">목</option>
+              <option value="고관절">고관절</option>
+            </select>
           </div>
 
           <div className="form-group">
@@ -215,38 +225,54 @@ function App() {
 
           <div className="form-group">
             <label className="label">성격/활동 성향</label>
-            <input
-              type="text"
+            <select
               name="personality"
               value={formData.personality}
               onChange={handleChange}
-              placeholder="예: 활동적, 조용한 편"
               className="input"
-            />
+            >
+              <option value="">선택해주세요</option>
+              <option value="매우 활동적">매우 활동적</option>
+              <option value="활동적">활동적</option>
+              <option value="보통">보통</option>
+              <option value="조용한 편">조용한 편</option>
+              <option value="매우 조용함">매우 조용함</option>
+            </select>
           </div>
 
           <div className="form-group">
             <label className="label">현재 운동량</label>
-            <input
-              type="text"
+            <select
               name="currentExercise"
               value={formData.currentExercise}
               onChange={handleChange}
-              placeholder="예: 주 3회 30분 걷기, 운동 안함"
               className="input"
-            />
+            >
+              <option value="">선택해주세요</option>
+              <option value="운동 안함">운동 안함</option>
+              <option value="주 1회 미만">주 1회 미만</option>
+              <option value="주 1-2회">주 1-2회</option>
+              <option value="주 3-4회">주 3-4회</option>
+              <option value="주 5회 이상">주 5회 이상</option>
+              <option value="매일">매일</option>
+            </select>
           </div>
 
           <div className="form-group">
             <label className="label">선호 운동 시간</label>
-            <input
-              type="text"
+            <select
               name="preferredTime"
               value={formData.preferredTime}
               onChange={handleChange}
-              placeholder="예: 오전, 오후, 저녁"
               className="input"
-            />
+            >
+              <option value="">선택해주세요</option>
+              <option value="새벽 (05:00-07:00)">새벽 (05:00-07:00)</option>
+              <option value="오전 (07:00-12:00)">오전 (07:00-12:00)</option>
+              <option value="오후 (12:00-18:00)">오후 (12:00-18:00)</option>
+              <option value="저녁 (18:00-21:00)">저녁 (18:00-21:00)</option>
+              <option value="상관없음">상관없음</option>
+            </select>
           </div>
 
           <button
